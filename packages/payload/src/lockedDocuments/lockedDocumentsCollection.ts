@@ -12,7 +12,12 @@ export const getLockedDocumentsCollection = (config: Config): CollectionConfig =
       type: 'relationship',
       index: true,
       maxDepth: 0,
-      relationTo: [...config.collections.map((collectionConfig) => collectionConfig.slug)],
+      relationTo: [
+        ...config.collections
+          .filter(collectionConfig => collectionConfig && typeof collectionConfig === 'object')
+          .map(collectionConfig => collectionConfig.slug)
+          .filter(Boolean)
+      ],
     },
     {
       name: 'globalSlug',
@@ -23,9 +28,14 @@ export const getLockedDocumentsCollection = (config: Config): CollectionConfig =
       name: 'user',
       type: 'relationship',
       maxDepth: 1,
-      relationTo: config.collections
-        .filter((collectionConfig) => collectionConfig.auth)
-        .map((collectionConfig) => collectionConfig.slug),
+     relationTo: config.collections
+        .filter(collectionConfig => 
+          collectionConfig && 
+          typeof collectionConfig === 'object' && 
+          collectionConfig.auth
+        )
+        .map(collectionConfig => collectionConfig.slug)
+        .filter(Boolean),
       required: true,
     },
   ],
